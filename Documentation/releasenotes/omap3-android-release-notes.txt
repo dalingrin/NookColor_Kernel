@@ -1,0 +1,145 @@
+# =====================================================================
+# L25.Inc2.5 Hand-off
+# =====================================================================
+
+Author: Leed Aguilar
+Date: March 15th 2010
+Target Release: L25.Inc2.5
+
+# =====================================================================
+# Configuration Settings
+# =====================================================================
+
+[KERNEL]
+Repo   : git://git.omapzoom.org/kernel/omap.git
+Branch : p-android-omap-2.6.29
+Commit : android-2.6.29-2.1-Inc2-5
+Config : zoom3_defconfig
+
+[U-BOOT]
+Repo   : git://git.omapzoom.org/repo/u-boot.git
+Branch : master
+Commit : 248783f15092779da506801e97936aa2b7ed3783
+Config : omap3630zoom3_config
+
+[X-LOADER]
+Repo   : git://git.omapzoom.org/repo/x-loader.git
+Branch : master
+Commit : 49f261c4e0bbc5d50e164f5fc58442dec68654b6
+Config : omap3630zoom3_config
+
+OS: Linux® 2.6.29
+Platform: ZOOM3 OMAP3630 ES1.0
+Toolchain: Code Sourcery 2008q3-72
+
+# =====================================================================
+# Cloning information
+# =====================================================================
+
+[KERNEL]
+git clone git://git.omapzoom.org/kernel/omap.git
+cd omap/
+git checkout --track -b p-android-omap-2.6.29 origin/p-android-omap-2.6.29
+git checkout android-2.6.29-2.1-Inc2-5
+make ROSS_COMPILE=arm-none-linux-gnueabi- zoom3_defconfig
+make ROSS_COMPILE=arm-none-linux-gnueabi- uImage
+OUTPUT: uImage
+
+[U-BOOT]
+mkdir Bootloader; cd Bootloader
+git clone  git://git.omapzoom.org/repo/u-boot.git
+make ROSS_COMPILE=arm-none-linux-gnueabi- omap3630zoom3_config
+make ROSS_COMPILE=arm-none-linux-gnueabi-
+OUTPUT: u-boot.bin
+
+[X-LOADER]
+cd Bootloader
+git clone git://git.omapzoom.org/repo/x-loader.git
+make ROSS_COMPILE=arm-none-linux-gnueabi- omap3630zoom3_config
+make ROSS_COMPILE=arm-none-linux-gnueabi- ift
+OUTPUT: MLO
+
+# =====================================================================
+# Known issues / Important Notes
+# =====================================================================
+
+This Release is intended to be used for Android Eclair 2.1:
+
+How obtain the Android source code:
+# repo init -u git://git.omapzoom.org/platform/omapmanifest.git -b eclair
+
+For more information on how to compile the Android Filesystem visit:
+http://omappedia.org/wiki/Android_Getting_Started#Building_Android
+
+IMPORTANT: Bootloader flash procedure has changed as follows:
+
+	Xloader Flashing:
+	dhcp 80000000 MLO;
+	nand unlock; nand ecc hw; nand erase 0 40000;
+	nand write.i 80000000 0 40000
+
+	Uboot Flashing:
+	dhcp 80000000 u-boot.bin;
+	nand unlock; nand ecc hw; nand erase 80000 40000;
+	nand write.i 80000000 80000 40000
+
+	Fastboot procedure remains the same.
+
+Highlights:
+
+- Android 2.6.29 common Kernel at 13168 Change ID
+- MUSB DMA optimizations
+- MUSB and MMC PM constraints update
+- EHCI PHY mode support for OMAP3630
+- Support for pre-multiplied alpha blending
+- OFF mode fixed for OMAP3430
+- GPS and FM Klocwork fixes
+- TV out support
+
+# =====================================================================
+# Gerrit IDs List
+# =====================================================================
+
+2453 - OMAP: DSS2: Switching GFX from LCD to TV
+2525 - OMAP: DSS2: Apply 5 levels of flicker filter to TVOut
+2497 - drivers: misc: GPS: De-queued SKB checked for valid memory
+2496 - drivers: misc: GPS: Queue empty check validation changed
+2495 - drivers: misc: FM:  NULL check condition added for 'payload'
+2494 - drivers: misc: GPS: Proper handling of ST registration
+2493-  drivers: misc: BT:  Correct timeout handled during ST
+2440 - UART: correct mode changes of UART2 interface for ZOOM3
+2451 - USB: MUSB: Double the size of gadget buffers in file_storage
+2339 - USB: MUSB: Add support for DMA Mode1 RX for file storage
+2431 - USB: EHCI: PHY enable after ECHI setup
+2448 - EHCI: USB1HS: set DIR line to pullup
+2439 - DSS2: Fix for spurious IRQ issue in DISPC interrupts
+2430 - DSS2: Enable TV detection feature
+2366 - Add support for packet synchronised sDMA transfers.
+2346 - OMAP: 3630: Correct min vdd1 opp frequency for mmc constraint
+2298 - KW: DSI: Fix uninitialized variable in dsi_display_run_test()
+2150 - KW: CLK: initialize 'ret' variable in omap_clk_for_each_child()
+2309 - DSS2: proDB "Support pre-multiplied alpha blending"
+2167 - BT: Adding MUX Setting for nShutDown line
+2372 - OMAP3:PM:USB need cpu check across sysconf settings
+2178 - OMAP3:PM:USB HOST Disable SAR for RET
+2350 - OMAP3:PM:DSP: Don't allow max ARM freq when DSP load is high
+2311 - OMAP3: CAM: Turn off pwr when no sensor detected
+2300 - OMAP:GPIO:fix number of valid  gpio pins to 192
+2270 - OMAP3: PM: deny INA state for MPU and CORE in C1
+2269 - zoom: camera: constrain mpu to C1 while camera power on
+2258 - DSPBRIDGE: remove unnecessary header file for common opp tables
+
+# =====================================================================
+# Changelist
+# =====================================================================
+
+Merge branch 'android-bridge-2.6.29' (64 commits)
+Merge branch 'camera-2.6.29' (4 commits)
+Merge branch 'omap_vout-2.6.29' (1 commits)
+Merged from omapzoom Gerrit (30 commits)
+
+92 files changed, 2715 insertions(+), 3986 deletions(-)
+
+# =====================================================================
+# =====================================================================
+

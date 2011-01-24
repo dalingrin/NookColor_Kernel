@@ -1,0 +1,65 @@
+::Embedded MMC (eMMC) FAT boot::
+
+Hardware modifications:
+  To boot from MMC2 (eMMC) on 3630 Zoom3, the following modification has to be 
+  made on the 3630 SOM:
+  SYS_BOOT[5:0]: 110001            USB -> UART3 -> MMC1 -> MMC2
+
+Notes:
+  Once the hardware modification has been done, we can no longer boot from NAND.
+  The only way to boot is either using MMC1 or MMC2. However, since NAND is 
+  still defined we can save the environment in NAND.
+  
+  The eMMC is located on the main board on the Zoom2/3. Some are of size 8GB and
+  some are of size 16GB.
+  Examples:
+  mmcblk1: mmc1:0001 STM08G 7.40 GiB
+  mmcblk1: mmc1:0001 STM16G 14.8 GiB  
+
+  If booting with an external MMC card in the slot, the kernel recognizes the 
+  card as mmcblk0 and the embedded MMC (eMMC) as mmcblk1.
+
+  If booting without an external MMC card in the slot, then the eMMC is 
+  recognized as mmcblk0.
+
+  If you insert an MMC/SD card at a later stage into the slot 
+  (i.e. while the kernel is booting), it becomes mmcblk1.
+
+  If booting with an external MMC card in the slot, make sure that the MMC2 
+  interface support has been enabled in the kernel.
+    To enable MMC2 support:
+    # make menuconfig
+      Device drivers --->
+        <*> MMC/SD/SDIO card support --->
+           [*] TI OMAP High Speed MMC2 Interface support
+
+  Once the kernel boots and mounts the filesystem:
+    # cat /proc/partitions
+      179        0    1927168 mmcblk0
+      179        1      72261 mmcblk0p1
+      179        2     634567 mmcblk0p2
+      179        8    7761920 mmcblk1
+
+Booting from eMMC:
+  In order to boot out of the embedded MMC (eMMC), we need to create a FAT 
+  partition. To do so, we can run the fdisk utitlity after the kernel has finished
+  booting. 
+  Example: # fdisk /dev/mmcblk1
+  Refer to this link for partitioning the eMMC:
+  http://omappedia.org/wiki/SD_Configuration
+
+  After creating the FAT partition on the eMMC, copy the MLO (x-loader) and 
+  u-boot.bin (bootloader) images to it.
+
+  To boot the kernel from eMMC, add the uImage to the FAT partition on eMMC.
+
+  To mount the filesystem from eMMC, copy the file system to the ext3 partition 
+  on the eMMC.
+
+  To boot from eMMC, remove the MMC/SD card from the slot and reset the board.
+  The x-loader logs will display "Starting OS Bootloader from eMMC ..." to 
+  indicate booting from eMMC.
+  
+For more information, refer to this wiki:
+http://omappedia.org/wiki/E-MMC_boot
+

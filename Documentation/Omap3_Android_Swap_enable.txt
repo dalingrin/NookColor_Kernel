@@ -1,0 +1,102 @@
+Procedure to enable linux swapping support on a omap3 based android platform.
+=============================================================================
+
+Linux divides its physical RAM (random access memory) into chucks of memory called pages.
+Swapping is the process whereby a page of memory is copied to the preconfigured space on 
+the physical media called swap space, to free up that page of memory. The combined sizes 
+of the physical memory and the swap space is the amount of virtual memory available.
+
+The kernel configuration option CONFIG_SWAP enables the above feature.
+
+This txt file breifly lists the procedure to enable swapping on a omap3 based platform runing
+android.It assumes that CONFIG_SWAP is enabled in the kernel.It describes the approach based 
+on the concept of a swap file.The physical media considered for storing the swap file are MMC/SD
+cards and NAND flash.
+
+MMC based fie systems:
+=====================
+
+It is assumed that an external Linux PC is used to build a android file system  which is then
+copied to an MMC/SD card.The intention is to also include a swap file into the file system which
+will later be used by the system for swap purpose.
+
+Execute the below steps from a Linux PC.
+========================================
+
+The first step is to create a swapfile to which the pages would be swapped.
+
+Use a dd command to create a 32MB swapfile.
+dd if=/dev/zero of=/swapfile bs=1024 count=32
+
+Convert the file to swap space.
+mkswap /swapfile
+If you see no errors your swap space is ready.
+
+Copy the swapfile to file system partition on the MMC/SD card(assuming that the FS was previously copied). 
+If the MMC/SD card partition is mounted as /media/disk-2 on your PC:
+
+cp /swapfile /media/disk-2/
+
+If you see no errors the swapfile is successfully copied to the android file system on a MMC/SD card.
+
+The next step would be to add an entry in the fstab file. Edit the "etc/fstab" file and add the
+below line(vi /media/disk-2/system/etc/fstab, this will create the fstab file if not present).
+
+/swapfile        none    swap    sw      0       0
+
+Now you are good to use the above file system present on the SD card to boot your board and turn
+on the swapping feature.
+
+After the kernel boots and mounts the above created file system from the SD card, the swapping can 
+be enabled by just typing the below command at the command prompt.
+
+./data/busybox/busybox swapon -a
+
+If you see a message as listed below the swapping is enabled successfully.
+Adding 65528k swap on /swpfile.  Priority:-1 extents:19 across:71868k SS
+
+The above can be verified by "cat /proc/swaps". Expect the below result.
+# cat /proc/swaps
+Filename                                Type            Size    Used    Priority
+/swpfile                                file            65528   0       -1
+
+As the system gets loaded the value in the "Used" field would change.
+
+Nand based file system:
+=======================
+
+The difference between the MMC based procedure described above vs the NAND based file systems is 
+mainly with respect to how the swapfile is copied to the NAND based file system.In the case of
+nand based system there is a need to recompile the file system after the swapfile is copied.
+
+Create the swapfile in a simillar way described above using the dd command and run the mkswap 
+utility in the same way on a Linux PC. 
+
+After this step the swapfile needs to be copied to the root directory of the android file system 
+source.
+
+cp /swapfile /out/target/product/zoom2/root/
+
+The next step is to create a fstab file and edit the same. 
+
+vi "out/target/product/zoom2/system/etc/fstab" and add the below line.
+
+/swapfile        none    swap    sw      0       0
+
+Rebuild the android file system and use fastboot to flash the same.
+
+After the kernel boots the swapfile can be found under /.
+
+The /etc/fstab should show the entry addded above.
+
+Now the swap can be turned on.
+
+/data/busybox/busybox swapon -a.
+
+The above can be verified by "cat /proc/swaps". Expect the below result.
+# cat /proc/swaps
+Filename                                Type            Size    Used
+Priority
+/swpfile                                file            65528   0       -1
+
+As the system gets loaded the value in the "Used" field would change.
