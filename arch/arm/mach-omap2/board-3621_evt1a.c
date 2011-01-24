@@ -624,9 +624,9 @@ static void __init omap_boxer_init_irq(void)
 {
 #if defined(CONFIG_MACH_OMAP3621_EVT1A) && defined (CONFIG_MACH_SDRAM_HYNIX_H8MBX00U0MER0EM_OR_SAMSUNG_K4X4G303PB)
 	omap2_init_common_hw(	h8mbx00u0mer0em_K4X4G303PB_sdrc_params ,
-				omap3621_mpu_rate_table,
-				omap3621_dsp_rate_table,
-				omap3621_l3_rate_table);
+				omap3630_mpu_rate_table,
+				omap3630_dsp_rate_table,
+				omap3630_l3_rate_table);
 
 #elif defined(CONFIG_MACH_OMAP3621_EVT1A) && defined(CONFIG_MACH_SDRAM_HYNIX_H8MBX00U0MER0EM)
 	omap2_init_common_hw(	h8mbx00u0mer0em_sdrc_params ,
