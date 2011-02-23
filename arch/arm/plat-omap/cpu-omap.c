@@ -134,7 +134,11 @@ static int __init omap_cpu_init(struct cpufreq_policy *policy)
 	if (policy->cpu != 0)
 		return -EINVAL;
 
-	policy->cur = policy->min = policy->max = omap_getspeed(0);
+#ifdef CONFIG_MACH_OMAP3621_EVT1A
+	policy->cur = policy->min = policy->max = 800000;
+#elif
+    policy->cur = policy->min = policy->max = omap_getspeed(0);
+#endif
 
 	clk_init_cpufreq_table(&freq_table);
 	if (freq_table) {
@@ -151,8 +155,14 @@ static int __init omap_cpu_init(struct cpufreq_policy *policy)
 	clk_set_rate(mpu_clk, policy->cpuinfo.max_freq * 1000);
 
 	policy->min = policy->cpuinfo.min_freq;
+    
+#ifdef CONFIG_MACH_OMAP3621_EVT1A
+	policy->max = 800000;
+	policy->cur = 800000;
+#elif
 	policy->max = policy->cpuinfo.max_freq;
 	policy->cur = omap_getspeed(0);
+#endif
 
 	/* FIXME: what's the actual transition time? */
 	policy->cpuinfo.transition_latency = 300 * 1000;
