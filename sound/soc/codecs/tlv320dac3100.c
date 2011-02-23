@@ -532,8 +532,8 @@ static const struct dac3100_configs dac3100_reg_init[] = {
     /* Mistral Added following configuration for EQ Setup */
     /* reg[0][65] should be configured to -6dB */
     /* Mistral: Updated the DACR volume also to -6dB */ 
-    {LDAC_VOL, 0xFD}, /* Update DACL volume control from -6db to -1.5db to get speaker and Headphone volume loud enough on Encore device */
-    {RDAC_VOL, 0xFD}, /* Update DACR volume control from -6db to -1.5db to get speaker and Headphone volume loud enough on Encore device */
+    {LDAC_VOL, 0x0}, /* Update DACL volume control from -6db to -1.5db to get speaker and Headphone volume loud enough on Encore device */
+    {RDAC_VOL, 0x0}, /* Update DACR volume control from -6db to -1.5db to get speaker and Headphone volume loud enough on Encore device */
     
     /* reg[1][42] should be configured at 0x04. This is already done above */
     /* reg[1][35] should be configured correctly. This is already done above */ 
